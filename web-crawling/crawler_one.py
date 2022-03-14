@@ -7,11 +7,21 @@
 import urllib.request as req
 import sys
 import os
+from html.parser import HTMLParser
 
-      
+#-------------------------------------------------------------------------
+# link extraction method
+class Parser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.output_list = []
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            self.output_list.append(dict(attrs).get('href'))
+
 #-------------------------------------------------------------------------
 ### generatePolicy classes
-  
+
   
 # Dummy fetch policy. Returns first element. Does nothing ;)
 class Dummy_Policy:
@@ -24,7 +34,33 @@ class Dummy_Policy:
     def updateURLs(self, c, retrievedURLs, retrievedURLsWD, iteration):
         pass
         
-    
+
+# LIFO policy. 
+class LIFO_Policy:
+    def __init__(self, c):
+        self.urls = c.seedURLs
+        #print("init self.urls: ", self.urls)
+        
+    def getURL(self, c, iteration):
+        #print("c.seedURLs: ", c.seedURLs)
+        
+        if len(self.urls) == 0:
+            return None
+        else:
+            # print("self.urls: ", self.urls)
+            # print("self.urls[-1]: ", self.urls[-1])
+            return self.urls.pop()
+            
+    def updateURLs(self, c, retrievedURLs, retrievedURLsWD, iteration):
+        #print("self.urls: ", self.urls)
+        #print("retrieved urls: ", retrievedURLs)
+        retrievedURLs_sorted = list(retrievedURLs)
+        retrievedURLs_sorted.sort(key=lambda url: url[len(url) - url[::-1].index('/'):])
+        #print("retrieved urls sorted: ", retrievedURLs_sorted)
+        for url in retrievedURLs_sorted:
+            self.urls.append(url)
+        
+        
 #-------------------------------------------------------------------------
 # Data container
 class Container:
@@ -45,11 +81,11 @@ class Container:
          # Incoming URLs (to <- from; set of incoming links)
         self.incomingURLs = {}
         # Class which maintains a queue of urls to visit. 
-        self.generatePolicy = Dummy_Policy()
+        self.generatePolicy = LIFO_Policy(self)
         # Page (URL) to be fetched next
         self.toFetch = None
         # Number of iterations of a crawler. 
-        self.iterations = 3
+        self.iterations = 10
 
         # If true: store all crawled html pages in the provided directory.
         self.storePages = True
@@ -64,7 +100,6 @@ class Container:
         # Analogously to outgoing
         self.storeIncomingURLs = True
         self.storedIncomingURLs = "/" + self.example + "/incoming/"
-        
         
         # If True: debug
         self.debug = True 
@@ -92,7 +127,7 @@ def main():
                 
         # Generate: it downloads html page under "toFetch URL"
         page = fetch(c)
-    
+        
         if page == None:
             if c.debug:
                 print("   Unexpected error; skipping this page")
@@ -185,18 +220,25 @@ def fetch(c):
         return None 
         
 #-------------------------------------------------------------------------  
-# Remove wrong URL (TODO)
+# Remove wrong URL
 def removeWrongURL(c):
-    #TODO
-    pass
+    # print("c.URLs before: ", c.URLs)
+    # print("c.toFetch: ", c.toFetch)
+    c.URLs.remove(c.toFetch)
+    #print("c.URLs after: ", c.URLs)
     
 #-------------------------------------------------------------------------  
 # Parse this page and retrieve text (whole page) and URLs (TODO)
 def parse(c, page, iteration):
+    
     # data to be saved (DONE)
     htmlData = page.read()
-    # obtained URLs (TODO)
-    retrievedURLs = set([])
+    
+    # obtained URLs
+    p = Parser()
+    p.feed(str(htmlData))
+    retrievedURLs = p.output_list
+    
     if c.debug:
         print("   Extracted " + str(len(retrievedURLs)) + " links")
 
@@ -208,18 +250,30 @@ def getNormalisedURLs(retrievedURLs):
     return retrievedURLs
     
 #-------------------------------------------------------------------------  
-# Remove duplicates (duplicates) (TODO)
+# Remove duplicates (duplicates), retrievedURLs has urls not present in c.URLs
 def removeDuplicates(c, retrievedURLs):
-    # TODO
-    return retrievedURLs
+    temp = []
+    for url in retrievedURLs:
+        if url not in c.URLs:
+            temp.append(url)
+    return temp
 
 #-------------------------------------------------------------------------  
-# Filter out some URLs (TODO)
+# Filter out some URLs
 def getFilteredURLs(c, retrievedURLs):
     toLeft = set([url for url in retrievedURLs if url.lower().startswith(c.rootPage)])
+    toLeft_filtered = []
+    for el in toLeft:
+        #print("el: ", el.lower())
+        if el.lower() != c.toFetch:
+            toLeft_filtered.append(el.lower())
+            
     if c.debug:
-        print("   Filtered out " + str(len(retrievedURLs) - len(toLeft)) + " urls")  
-    return toLeft
+        # print("c.toFetch: ", c.toFetch)
+        # print("toLeft: ", toLeft)
+        # print("len(retrievedURLs): ", len(retrievedURLs), " len(toLeft): ", len(toLeft))
+        print("   Filtered out " + str(len(retrievedURLs) - len(toLeft_filtered)) + " urls")  
+    return toLeft_filtered
     
 #-------------------------------------------------------------------------  
 # Store HTML pages (DONE)  
