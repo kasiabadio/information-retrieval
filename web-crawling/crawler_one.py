@@ -61,6 +61,24 @@ class LIFO_Policy:
             self.urls.append(url)
         
         
+# FIFO policy. 
+class FIFO_Policy:
+    def __init__(self, c):
+        self.urls = c.seedURLs
+        
+    def getURL(self, c, iteration):
+        
+        if len(self.urls) == 0:
+            return None
+        else:
+            return self.urls.pop(0)
+            
+    def updateURLs(self, c, retrievedURLs, retrievedURLsWD, iteration):
+        retrievedURLs_sorted = list(retrievedURLs)
+        retrievedURLs_sorted.sort(key=lambda url: url[len(url) - url[::-1].index('/'):])
+        for url in retrievedURLs_sorted:
+            self.urls.append(url)
+        
 #-------------------------------------------------------------------------
 # Data container
 class Container:
@@ -81,7 +99,7 @@ class Container:
          # Incoming URLs (to <- from; set of incoming links)
         self.incomingURLs = {}
         # Class which maintains a queue of urls to visit. 
-        self.generatePolicy = LIFO_Policy(self)
+        self.generatePolicy = FIFO_Policy(self)
         # Page (URL) to be fetched next
         self.toFetch = None
         # Number of iterations of a crawler. 
