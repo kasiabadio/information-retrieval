@@ -39,16 +39,25 @@ class Dummy_Policy:
 class LIFO_Policy:
     def __init__(self, c):
         self.urls = c.seedURLs
-        #print("init self.urls: ", self.urls)
+        self.seedurls = self.urls
+        # print("INIT self.urls: ", self.urls)
+        # print("INIT self.seedurls: ", self.seedurls)
         
     def getURL(self, c, iteration):
-        #print("c.seedURLs: ", c.seedURLs)
         
         if len(self.urls) == 0:
-            return None
+            
+            #print("WHEN len(self.urls)==0: ", self.urls)
+            # print("c.seedURLs ", c.seedURLs)
+            # print("c.seedURLs_refill ", c.seedurls_refill)
+            #print("self.seedurls ", self.seedurls)
+            self.urls = c.seedurls_refill
+            
+            return self.urls.pop()
         else:
-            # print("self.urls: ", self.urls)
-            # print("self.urls[-1]: ", self.urls[-1])
+            #print("WHEN len(self.urls)!=0: ", self.urls)
+            #print("c.seedURLs ", c.seedURLs)
+            #print("self.seedurls: ", self.seedurls)
             return self.urls.pop()
             
     def updateURLs(self, c, retrievedURLs, retrievedURLsWD, iteration):
@@ -69,7 +78,8 @@ class FIFO_Policy:
     def getURL(self, c, iteration):
         
         if len(self.urls) == 0:
-            return None
+            self.urls = c.seedurls_refill
+            return self.urls.pop(0)
         else:
             return self.urls.pop(0)
             
@@ -92,6 +102,10 @@ class Container:
         # Initial links to visit
         self.seedURLs = ["http://www.cs.put.poznan.pl/mtomczyk/ir/lab1/"
             + self.example + "/s0.html"]
+        
+        self.seedurls_refill = ["http://www.cs.put.poznan.pl/mtomczyk/ir/lab1/"
+            + self.example + "/s0.html"]
+        
         # Maintained URLs
         self.URLs = set([])
         # Outgoing URLs (from -> list of outgoing links)
@@ -128,6 +142,7 @@ def main():
     c = Container()
     # Inject: parse seed links into the base of maintained URLs
     inject(c)
+  
     
     # Iterate...
     for iteration in range(c.iterations):
@@ -204,6 +219,8 @@ def main():
 #-------------------------------------------------------------------------
 # Inject seed URL into a queue (DONE)
 def inject(c):
+    # print("INJECT")
+    # print("c.seedURLs: ", c.seedURLs)
     for l in c.seedURLs:
         if c.debug: 
             print("Injecting " + str(l))
