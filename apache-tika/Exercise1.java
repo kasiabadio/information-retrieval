@@ -1,10 +1,24 @@
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.tika.exception.TikaException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class Exercise1
 {
@@ -32,7 +46,46 @@ public class Exercise1
         System.out.println("Running exercise 1a...");
         LinkedList <String> results = new LinkedList <>();
 
-        // TODO
+        // getting the phone numbers from the files stored in the archive
+        ZipFile file = new ZipFile("Exercise1.zip");
+
+        Enumeration entries = file.entries();
+        while (entries.hasMoreElements()){
+
+            ZipEntry entry = (ZipEntry) entries.nextElement();
+            InputStream stream = file.getInputStream(entry);
+
+            String name = entry.getName();
+            String name1 = name.substring(name.lastIndexOf(".") + 1, name.length());
+
+            if (name1.equals("pdf")){
+                // get the text content and regex expressions the get the phone numbers
+                PDFTextStripper pdfStripper = new PDFTextStripper();
+                PDDocument doc = PDDocument.load(stream);
+                String content = pdfStripper.getText(doc);
+                // System.out.println(content);
+                Pattern pattern = Pattern.compile("\\([0-9]{3}\\) ?[0-9-]+");
+                Matcher matcher = pattern.matcher(content);
+                while (matcher.find()){
+                    String text = matcher.group();
+                    //System.out.println(text);
+                    results.add(text);
+                }
+
+            } else if (name1.equals("xml")){
+                // get all nodes having the specified tag name (phone)
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                Document document = db.parse(stream);
+                NodeList nl = document.getElementsByTagName("Phone");
+
+                for (int i = 0; i < nl.getLength(); i++){
+                    Node node = nl.item(i);
+                    results.add(nl.item(i).getTextContent());
+                }
+            }
+            stream.close();
+        }
 
         return results;
     }
