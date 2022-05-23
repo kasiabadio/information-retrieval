@@ -1,0 +1,185 @@
+Movie: 12 Angry Men
+Sentences: 5
+Tokens: 176
+Stemmed forms (unique): 114
+Words from a dictionary (unique): 176
+People: 
+Locations: 
+Organizations: 
+
+Movie: 12 Years a Slave
+Sentences: 31
+Tokens: 1190
+Stemmed forms (unique): 531
+Words from a dictionary (unique): 1190
+People: 
+Locations: 
+Organizations: 
+
+Movie: 4 Months, 3 Weeks and 2 Days
+Sentences: 9
+Tokens: 208
+Stemmed forms (unique): 129
+Words from a dictionary (unique): 208
+People: 
+Locations: 
+Organizations: 
+
+Movie: All About Eve
+Sentences: 8
+Tokens: 259
+Stemmed forms (unique): 144
+Words from a dictionary (unique): 259
+People: 
+Locations: 
+Organizations: 
+
+Movie: American Graffiti
+Sentences: 29
+Tokens: 672
+Stemmed forms (unique): 318
+Words from a dictionary (unique): 672
+People: 
+Locations: 
+Organizations: 
+
+Movie: Boyhood
+Sentences: 14
+Tokens: 368
+Stemmed forms (unique): 210
+Words from a dictionary (unique): 368
+People: 
+Locations: 
+Organizations: 
+
+Movie: Casablanca
+Sentences: 11
+Tokens: 337
+Stemmed forms (unique): 209
+Words from a dictionary (unique): 337
+People: 
+Locations: 
+Organizations: 
+
+Movie: Citizen Kane
+Sentences: 6
+Tokens: 281
+Stemmed forms (unique): 166
+Words from a dictionary (unique): 281
+People: 
+Locations: 
+Organizations: 
+
+Movie: Gone with the Wind
+Sentences: 6
+Tokens: 237
+Stemmed forms (unique): 149
+Words from a dictionary (unique): 237
+People: 
+Locations: 
+Organizations: 
+
+Movie: Hoop Dreams
+Sentences: 65
+Tokens: 1564
+Stemmed forms (unique): 508
+Words from a dictionary (unique): 1564
+People: 
+Locations: 
+Organizations: 
+
+Movie: Manchester by the Sea
+Sentences: 28
+Tokens: 719
+Stemmed forms (unique): 331
+Words from a dictionary (unique): 719
+People: 
+Locations: 
+Organizations: 
+
+Movie: Moonlight
+Sentences: 12
+Tokens: 417
+Stemmed forms (unique): 225
+Words from a dictionary (unique): 417
+People: 
+Locations: 
+Organizations: 
+
+Movie: My Left Foot
+Sentences: 9
+Tokens: 217
+Stemmed forms (unique): 121
+Words from a dictionary (unique): 217
+People: 
+Locations: 
+Organizations: 
+
+Movie: Pan's Labyrinth
+Sentences: 25
+Tokens: 852
+Stemmed forms (unique): 407
+Words from a dictionary (unique): 852
+People: 
+Locations: 
+Organizations: 
+
+Movie: Psycho
+Sentences: 24
+Tokens: 671
+Stemmed forms (unique): 320
+Words from a dictionary (unique): 671
+People: 
+Locations: 
+Organizations: 
+
+Movie: Ran
+Sentences: 11
+Tokens: 407
+Stemmed forms (unique): 217
+Words from a dictionary (unique): 407
+People: 
+Locations: 
+Organizations: 
+
+Movie: Singin' in the Rain
+Sentences: 3
+Tokens: 144
+Stemmed forms (unique): 88
+Words from a dictionary (unique): 144
+People: 
+Locations: 
+Organizations: 
+
+Movie: Some Like It Hot
+Sentences: 69
+Tokens: 1451
+Stemmed forms (unique): 524
+Words from a dictionary (unique): 1451
+People: 
+Locations: 
+Organizations: 
+
+Movie: The Godfather
+Sentences: 34
+Tokens: 807
+Stemmed forms (unique): 385
+Words from a dictionary (unique): 807
+People: 
+Locations: 
+Organizations: 
+
+Movie: Three Colors Red
+Sentences: 19
+Tokens: 559
+Stemmed forms (unique): 278
+Words from a dictionary (unique): 559
+People: 
+Locations: 
+Organizations: 
+
+---------OVERALL STATISTICS----------
+Verbs: 12.77%
+Nouns: 26.72%
+Adjectives: 8.66%
+Adverbs: 4.81%

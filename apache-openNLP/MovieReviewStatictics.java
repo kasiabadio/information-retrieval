@@ -12,13 +12,11 @@ import opennlp.tools.util.Span;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +43,8 @@ public class MovieReviewStatictics
 
     public static void main(String[] args)
     {
-        MovieReviewStatictics statictics = new MovieReviewStatictics();
-        statictics.run();
+        MovieReviewStatictics statistics = new MovieReviewStatictics();
+        statistics.run();
     }
 
     private void run()
@@ -83,20 +81,31 @@ public class MovieReviewStatictics
 
     private void initModelsStemmerLemmatizer()
     {
-        //try
-        //{
-        // TODO: load all OpenNLP models (+Porter stemmer + lemmatizer)
-        // from files (use class variables)
+        try
+        {
+            _stemmer = new PorterStemmer();
 
-        //} catch (IOException ex)
-        //{
-        //    Logger.getLogger(MovieReviewStatictics.class.getName()).log(Level.SEVERE, null, ex);
-        //}
+            InputStream is = getClass().getResourceAsStream("/models/en-lemmatizer.dict");
+            _lemmatizer = new DictionaryLemmatizer(is);
+
+            _tokenizerModel = new TokenizerModel(new File("models/de-token.bin"));
+
+            _posModel = new POSModel(new File("models/en-pos-maxent.bin"));
+
+            _sentenceModel = new SentenceModel(new File("models/en-sent.bin"));
+
+            _peopleModel = new TokenNameFinderModel(new File("models/en-ner-person.bin"));
+            _placesModel = new TokenNameFinderModel(new File("models/en-ner-location.bin"));
+            _organizationsModel = new TokenNameFinderModel(new File("models/en-ner-organization.bin"));
+
+        } catch (IOException ex)
+        {
+            Logger.getLogger(MovieReviewStatictics.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    private void processFile(String text)
-    {
-        // TODO: process the text to find the following statistics:
+    private void processFile(String text) throws IOException {
+        // process the text to find the following statistics:
         // For each movie derive:
         //    - number of sentences
         int noSentences = 0;
@@ -113,7 +122,7 @@ public class MovieReviewStatictics
         //    - organisations
         Span organisations[] = new Span[] { };
 
-        // TODO + compute the following overall (for all movies) POS tagging statistics:
+        // + compute the following overall (for all movies) POS tagging statistics:
         //    - percentage number of adverbs (class variable, private int _verbCount = 0)
         //    - percentage number of adjectives (class variable, private int _nounCount = 0)
         //    - percentage number of verbs (class variable, private int _adjectiveCount = 0)
@@ -122,34 +131,61 @@ public class MovieReviewStatictics
 
         // ------------------------------------------------------------------
 
-        // TODO derive sentences (update noSentences variable)
+        // derive sentences (update noSentences variable)
+        SentenceDetectorME sd = new SentenceDetectorME(_sentenceModel);
+        noSentences = sd.sentDetect(text).length;
 
-
-        // TODO derive tokens and POS tags from text
+        // derive tokens and POS tags from text
         // (update noTokens and _totalTokensCount)
+        TokenizerME tm = new TokenizerME(_tokenizerModel);
+        String [] tokens = tm.tokenize(text);
+        noTokens = tokens.length;
+        _totalTokensCount += noTokens;
+        POSTaggerME tagger = new POSTaggerME(_posModel);
+        String [] tags = tagger.tag(tokens);
 
-        // TODO perform stemming (use derived tokens)
+        // perform stemming (use derived tokens)
         // (update noStemmed)
-        //Set <String> stems = new HashSet <>();
+        Set <String> stems = new HashSet <>();
+        for (String token: tokens){
+            stems.add(_stemmer.stem(token.toLowerCase().replaceAll("[^a-z0-9]", "")));
+        }
+        noStemmed = stems.size();
 
-        //for (String token : tokens)
-        //{
-            // use .toLowerCase().replaceAll("[^a-z0-9]", ""); thereafter, ignore "" tokens
-        //}
-
-
-        // TODO perform lemmatization (use derived tokens)
+        // perform lemmatization (use derived tokens)
         // (remove "O" from results - non-dictionary forms, update noWords)
+        String [] lemmatized = _lemmatizer.lemmatize(tokens, tags);
+        List<String> lemmatized_new = new ArrayList<String>(Arrays.asList(lemmatized));
+        lemmatized_new.remove("0");
+        lemmatized = lemmatized_new.toArray(new String[0]);
+        noWords = lemmatized.length;
 
-
-        // TODO derive people, locations, organisations (use tokens),
+        // derive people, locations, organisations (use tokens),
         // (update people, locations, organisations lists).
+        NameFinderME peopleFinder = new NameFinderME(_peopleModel);
+        //people = peopleFinder.find(tokens);
 
-        // TODO update overall statistics - use tags and check first letters
-        // (see https://www.clips.uantwerpen.be/pages/mbsp-tags; first letter = "V" = verb?)
+        NameFinderME placesFinder = new NameFinderME(_placesModel);
+        //locations = placesFinder.find(tokens);
+
+        NameFinderME organizationsFinder = new NameFinderME(_organizationsModel);
+        //organisations = organizationsFinder.find(tokens);
+
+        // update overall statistics - use tags and check first letters
+        // verb, noun, adjective, adverb (czasownik, rzeczownik, przymiotnik, przysłówek)
+        for (String tag: tags){
+            if (tag.startsWith("V")){
+                _verbCount++;
+            } else if (tag.startsWith("N")){
+                _nounCount++;
+            } else if (tag.startsWith("J")){
+                _adjectiveCount++;
+            } else if (tag.startsWith("R")){
+                _adverbCount++;
+            }
+        }
 
         // ------------------------------------------------------------------
-
         saveResults("Sentences", noSentences);
         saveResults("Tokens", noTokens);
         saveResults("Stemmed forms (unique)", noStemmed);

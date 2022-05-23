@@ -41,13 +41,13 @@ public class OpenNLP {
 	public void run() throws IOException
     {
 		//languageDetection();
-		//tokenization();
+		tokenization();
         //sentenceDetection();
 		//posTagging();
 		//lemmatization();
 		//stemming();
 		//chunking();
-		nameFinding();
+		//nameFinding();
 	}
 
 	private void languageDetection() throws IOException
@@ -223,7 +223,6 @@ public class OpenNLP {
 
 		// Answer: Lemmatizer changed "are" to "be" and porter stemmer cut it to "ar"
 		// For "asd" word, stemmer didn't do anything
-
 	}
 	
 	private void chunking() throws IOException
