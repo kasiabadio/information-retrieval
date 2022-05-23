@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="apache-openNLP">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/movies.zip!/" />
+      <root url="jar://$PROJECT_DIR$/opennlp-tools-1.8.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/models.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
